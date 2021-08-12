@@ -2,14 +2,11 @@ import * as React from 'react';
 import type { NextPage } from 'next';
 import issuesService from '../../services/issue.service';
 import styled from 'styled-components';
-import Issue from '../../types/issue.interface';
-import IssueCard from '../../components/IssueCard';
+import Issue, { Workflow } from '../../types/issue.interface';
+import IssueList from '../../components/issues/IssueList';
 import AlertMessage from '../../components/AlertMessage';
-import { BiHelpCircle } from 'react-icons/bi';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 
-const PageContainer = styled.div`
+const PageContainer = styled.main`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -26,9 +23,22 @@ const IssuesContainer = styled.div`
 `;
 
 const AyudaPage: NextPage = () => {
-  const [issues, setIssues] = React.useState<Issue[]>([]);
+  const [issues, setIssues] = React.useState<Issue[]>([]); // Lista de issues, ya sea cargada desde la API o mediante la propiedad childs de una issue clickeada
 
   const [currentIssue, setCurrentIssue] = React.useState<Issue | null>(null); // Issue seleccionado
+  const [currentStep, setCurrentStep] = React.useState<Workflow | null>(null);
+
+  const getCurrentStep = () => currentIssue?.workflow?.find((w) => w.order === 1)?.type;
+
+  // Cuando clickee un issue de la lista
+  const handleIssueClick = (clicked: Issue) => {
+    // Si el issue clickeado tiene childs o el paso actual es SHOW_CHILDREN, reemplazar la lista de issues actual con childs
+    if (getCurrentStep() === 'SHOW_CHILDREN') {
+      setIssues(clicked.childs);
+    }
+
+    setCurrentIssue(clicked);
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -44,31 +54,17 @@ const AyudaPage: NextPage = () => {
     fetchData();
   }, []);
 
-  // Cuando clickee un issue de la lista
-  const handleIssueClick = (clicked: Issue) => {
-    if (clicked.childs.length > 0) setIssues(clicked.childs);
-    setCurrentIssue(clicked);
-  };
-
   return (
     <PageContainer>
-      <Link href='/ayuda'>
-        <a>
-          <h1>Centro de Ayuda</h1>
-        </a>
-      </Link>
-      <IssuesContainer>
-        {currentIssue && (
-          <div>
-            <BiHelpCircle />
-            <h2>{currentIssue.title}</h2>
-          </div>
-        )}
-        {issues.map((d) => (
-          <IssueCard key={d.issueId} issue={d} onClick={handleIssueClick} />
-        ))}
-        <AlertMessage warning message='test' />
-      </IssuesContainer>
+      <a href='/ayuda'>
+        <h1>Centro de Ayuda</h1>
+      </a>
+
+      {currentIssue && <h2>{currentIssue.title}</h2>}
+
+      {Array.isArray(issues) && <IssueList issues={issues} onIssueClick={handleIssueClick} />}
+
+      <AlertMessage warning message='test' />
     </PageContainer>
   );
 };

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Issue from '../types/issue.interface';
+import Issue from '../../types/issue.interface';
 import { AiOutlineArrowRight } from 'react-icons/ai';
 
 const Container = styled.div`
