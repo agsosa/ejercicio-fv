@@ -40,12 +40,6 @@ export interface MyShoppingData {
   transitedOn: Date;
 }
 
-export interface Seller2 {
-  id: string;
-  name: string;
-  invoiceA: boolean;
-}
-
 export interface DeliveryAddress {
   street: string;
   zipCode: string;
@@ -63,7 +57,7 @@ export interface OrderDelivery {
   deliveryPromisedTimeRange: DeliveryPromisedTimeRange;
   myShoppingData: MyShoppingData;
   delayed: boolean;
-  seller: Seller2;
+  seller: Seller;
   hasAgenda: boolean;
   deliveryAddress: DeliveryAddress;
   deliveryType: string;
@@ -73,25 +67,9 @@ export interface OrderDelivery {
   fravegaEnvio: boolean;
 }
 
-export interface Seller3 {
-  id: string;
-  name: string;
-  invoiceA: boolean;
-}
-
-export interface Item2 {
-  name: string;
-  imageUrl: string;
-  detailUrl: string;
-  id: string;
-  price: number;
-  quantity: string;
-  courierId: string;
+export interface DeliveryItem extends Item {
   deliveryId: string;
   deliveryObjectId: string;
-  orderId: string;
-  seller: Seller3;
-  enabled: boolean;
 }
 
 export interface ItemsByDelivery {
@@ -100,7 +78,7 @@ export interface ItemsByDelivery {
   deliveryType: string;
   orderDelivery: OrderDelivery;
   enabled: boolean;
-  items: Item2[];
+  items: DeliveryItem[];
 }
 
 export default interface Order {
