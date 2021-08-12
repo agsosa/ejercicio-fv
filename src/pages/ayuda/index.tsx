@@ -9,6 +9,7 @@ import IssueList from '../../components/issues/IssueList';
 import OrdersList from '../../components/OrdersList';
 import OrderDetails from '../../components/order-details';
 import AlertMessage from '../../components/AlertMessage';
+import ContentContainer from '../../components/layout/ContentContainer';
 
 const TitleContainer = styled.div`
   display: flex;
@@ -130,19 +131,18 @@ const AyudaPage: NextPage = () => {
   if (state.isLoading) return <b>Cargando...</b>;
 
   return (
-    <>
+    <ContentContainer>
       {state.currentIssue && (
         <TitleContainer>
           <h2>{state.currentIssue.title}</h2>
-          <h3>{state.currentIssue.subReason_salesforce}</h3>
         </TitleContainer>
       )}
       {bShowIssuesList && <IssueList issues={state.issues} onIssueClick={handleIssueClick} />}
       {bShowOrdersList && <OrdersList onOrderClick={handleOrderClick} />}
       {bShowOrderDetails && <OrderDetails order={state.order} />}
-      <AlertMessage warning message='test' />
+
       Current workflow type: {state.workflowType || 'None'} | Current workflow order: {state.workflowOrder}
-    </>
+    </ContentContainer>
   );
 };
 

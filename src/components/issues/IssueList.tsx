@@ -7,8 +7,7 @@ const IssuesContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 64rem;
-  background-color: ${(props) => props.theme.silver};
+  background-color: ${(props) => props.theme.gray100};
 `;
 
 interface PropTypes {
