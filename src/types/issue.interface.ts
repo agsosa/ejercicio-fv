@@ -1,3 +1,5 @@
+// NOTA: Generado automaticamente, podría estar incompleto
+
 export interface Title {
   type: string;
   text: string;
