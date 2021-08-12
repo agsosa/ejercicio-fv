@@ -23,11 +23,19 @@ const OrderCard = styled.div`
   }
 `;
 
-export default function OrdersList() {
+interface PropTypes {
+  onOrderClick: (orderId: string) => void;
+}
+
+export default function OrdersList({ onOrderClick }: PropTypes) {
+  const handleOrderClick = (orderId: string) => {
+    if (onOrderClick) onOrderClick(orderId);
+  };
+
   return (
     <Container>
       {ORDERS.map((o) => (
-        <OrderCard key={o}>
+        <OrderCard key={o} onClick={() => handleOrderClick(o)}>
           Pedido <b>#{o}</b>
         </OrderCard>
       ))}

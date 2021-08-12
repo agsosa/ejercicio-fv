@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Issue from '../types/issue.interface';
+import Order from '../../types/order.interface';
 
 const Container = styled.div`
   background-color: ${(props) => props.theme.main};
@@ -11,9 +11,9 @@ const Container = styled.div`
 `;
 
 interface PropTypes {
-  issue: Issue;
+  order: Order;
 }
 
-export default function OrderCard({ issue }: PropTypes) {
-  return <Container>{issue.title}</Container>;
+export default function OrderCard({ order }: PropTypes) {
+  return <Container>detalles order {order.orderId}</Container>;
 }

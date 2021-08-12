@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 import theme from '../lib/theme';
 import { ThemeProvider } from 'styled-components';
 import Head from 'next/head';
+import PageContainer from '../components/layout/PageContainer';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -12,7 +13,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='description' content='Ejercicio' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Component {...pageProps} />
+      <PageContainer>
+        <a href='/ayuda'>
+          <h1>Centro de Ayuda</h1>
+        </a>
+        <Component {...pageProps} />
+      </PageContainer>
     </ThemeProvider>
   );
 }
