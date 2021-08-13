@@ -37,7 +37,7 @@ function reducer(state: State, action: Action): State {
     // Set issues list & reset workflow
     case ActionsEnum.SET_ISSUES:
       return { ...state, issues: payload, workflowOrder: 1, workflowType: undefined };
-    // Set current issue, replace issues list with children issues & reset workflow
+    // Set current issue, replace issues list with children issues if possible & reset workflow
     case ActionsEnum.SET_CURRENT_ISSUE:
       return {
         ...state,
@@ -50,13 +50,14 @@ function reducer(state: State, action: Action): State {
     case ActionsEnum.INCREMENT_WORKFLOW_STEP:
       const newOrder = state.workflowOrder + 1;
 
-      if (state.currentIssue?.workflow && newOrder > state.currentIssue.workflow.length) return state; // No aumentar workflow step si ya está en el último
-
-      return {
-        ...state,
-        workflowOrder: newOrder,
-        workflowType: state.currentIssue?.workflow?.find((w: Workflow) => w.order === newOrder)?.type,
-      };
+      if (state.currentIssue && newOrder <= state.currentIssue.workflow.length) {
+        // Only increment workflow order if we have a valid currentIssue and newOrder is in range of currentIssue.workflow.length
+        return {
+          ...state,
+          workflowOrder: newOrder,
+          workflowType: state.currentIssue.workflow.find((w: Workflow) => w.order === newOrder)?.type,
+        };
+      } else return state;
     // Set current order
     case ActionsEnum.SET_ORDER:
       return { ...state, order: payload };
