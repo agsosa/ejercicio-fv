@@ -2,8 +2,9 @@ import * as React from 'react';
 import styled from 'styled-components';
 import Order from '../../types/order.interface';
 import ClientCard from './ClientCard';
-import ProductsCard from './ProductsCard';
+import DeliveryCard from './DeliveryCard';
 import OrderDetails from './OrderDetails';
+import AlertMessage from '../AlertMessage';
 
 const Container = styled.div`
   width: 100%;
@@ -30,8 +31,8 @@ interface PropTypes {
 }
 
 export default function OrderCard({ order }: PropTypes) {
-  const { clientProfileData, orderId, creationDate, items } = order;
-
+  const { clientProfileData, itemsByDelivery } = order;
+  
   return (
     <Container>
       <Summary>
@@ -39,7 +40,11 @@ export default function OrderCard({ order }: PropTypes) {
         <OrderDetails order={order} />
       </Summary>
 
-      <ProductsCard products={items} />
+      {itemsByDelivery.length === 0 && <AlertMessage warning message="No se puede trackear el envío ya que la orden es de retiro en sucursal." />}
+
+      {itemsByDelivery.length > 0 && itemsByDelivery.map((d) => (
+        <DeliveryCard key={d.id} delivery={d} />
+      ))}
     </Container>
   );
 }

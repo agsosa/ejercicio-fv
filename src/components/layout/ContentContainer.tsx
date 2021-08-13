@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 
-const PageContainer = styled.main`
+const ContentContainer = styled.main`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -10,4 +10,4 @@ const PageContainer = styled.main`
   max-width: 64rem;
 `;
 
-export default PageContainer;
+export default ContentContainer;

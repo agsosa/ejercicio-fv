@@ -25,7 +25,7 @@ const VStack = styled.div`
 
 const Value = styled.span`
   font-size: 1.2rem;
-  ${props => props.important && css`font-weight: 500;`}
+  ${(props: { important?: boolean }) => props.important && css`font-weight: 500;`}
 `;
 
 interface PropTypes {

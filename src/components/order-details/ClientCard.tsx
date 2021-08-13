@@ -13,7 +13,8 @@ const ClientDataContainer = styled.div`
   text-transform: uppercase;
   font-size: 1rem;
 
-  > * + * { /* GAP */
+  > * + * {
+    /* GAP */
     margin-left: 1.5rem;
   }
 `;

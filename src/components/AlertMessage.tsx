@@ -1,11 +1,14 @@
 import styled from 'styled-components';
-import { AiOutlineArrowRight } from 'react-icons/ai';
 
 const Container = styled.div`
   border-radius: 0.75rem;
-  padding: 1.5rem;
+  padding: 1rem;
+  text-align: center;
   font-size: 1.5rem;
-  background-color: ${(props) => (props.warning ? '#FFF3CD' : '#CCE5FF')};
+  background-color: ${(props: { warning?: boolean }) => {
+    if (props.warning) return '#FFF4CF';
+    else return '#CCE5FF';
+  }};
 `;
 
 interface PropTypes {
