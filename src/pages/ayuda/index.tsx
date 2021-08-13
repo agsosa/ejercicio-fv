@@ -1,15 +1,12 @@
 import * as React from 'react';
 import type { NextPage } from 'next';
-import issuesService from '../../services/issue.service';
-import composerService from '../../services/composer.service';
 import styled from 'styled-components';
-import Issue, { Workflow } from '../../types/issue.interface';
-import Order from '../../types/order.interface';
+import Issue from '../../types/issue.interface';
 import IssueList from '../../components/issues/IssueList';
 import OrdersList from '../../components/OrdersList';
 import OrderDetails from '../../components/order-details';
-import AlertMessage from '../../components/AlertMessage';
 import ContentContainer from '../../components/layout/ContentContainer';
+import useIssues from '../../lib/useIssues';
 
 const TitleContainer = styled.div`
   display: flex;
@@ -17,116 +14,26 @@ const TitleContainer = styled.div`
   align-items: center;
 `;
 
-enum ActionsEnum {
-  SET_CURRENT_ISSUE = 'SET_CURRENT_ISSUE',
-  SET_ISSUES = 'SET_ISSUES',
-  ADVANCE_WORKFLOW_STEP = 'ADVANCE_WORKFLOW_STEP',
-  SET_LOADING = 'SET_LOADING',
-  SET_ORDER = 'SET_ORDER',
-}
-
-interface Action {
-  type: ActionsEnum;
-  payload: any;
-}
-
-interface State {
-  issues?: Issue[];
-  currentIssue?: Issue;
-  order?: Order;
-  workflowOrder: number;
-  workflowType?: string;
-  isLoading: boolean;
-  error?: string;
-}
-
-const initialState: State = { isLoading: true, workflowOrder: 1 };
-
-function reducer(state: State, action: Action) {
-  const { type, payload } = action;
-
-  switch (type) {
-    case ActionsEnum.SET_ISSUES:
-      return { ...state, issues: payload, workflowOrder: 1, workflowType: null };
-    case ActionsEnum.SET_CURRENT_ISSUE:
-      return {
-        ...state,
-        issues: payload.childs?.length > 0 ? payload.childs : state.issues,
-        currentIssue: payload,
-        workflowOrder: 1,
-        workflowType: payload?.workflow?.find((w: Workflow) => w.order === 1)?.type,
-      };
-    case ActionsEnum.ADVANCE_WORKFLOW_STEP:
-      const newOrder = state.workflowOrder + 1;
-
-      if (state.currentIssue?.workflow && newOrder > state.currentIssue.workflow.length) return state; // No aumentar workflow step si ya está en el último
-
-      return {
-        ...state,
-        workflowOrder: newOrder,
-        workflowType: state.currentIssue?.workflow?.find((w: Workflow) => w.order === newOrder)?.type,
-      };
-    case ActionsEnum.SET_ORDER:
-      return { ...state, order: payload };
-    case ActionsEnum.SET_LOADING:
-      return { ...state, isLoading: payload };
-    default:
-      return state;
-  }
-}
-
 const AyudaPage: NextPage = () => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const { state, setIssue, fetchOrder } = useIssues();
 
-  const bShowIssuesList =
-    Array.isArray(state.issues) && (state.workflowType == null || state.workflowType === 'SHOW_CHILDREN'); // ¿Mostrar lista de issues?
-  const bShowOrdersList = !state.order && state.workflowType === 'SHOW_PRODUCT_SELECTION'; // ¿Mostrar lista de orders?
-  const bShowOrderDetails = state.order && state.workflowType === 'SHOW_PRODUCT_SELECTION'; // ¿Mostrar detalle de order?
+  // ¿Mostrar lista de issues?
+  const bShowIssuesList = state.workflowType == null || state.workflowType === 'SHOW_CHILDREN';
 
-  // Obtener lista de issues (client side)
-  const fetchIssues = async () => {
-    dispatch({ type: ActionsEnum.SET_LOADING, payload: true });
+  // ¿Mostrar lista de orders?
+  const bShowOrdersList = !state.order && state.workflowType === 'SHOW_PRODUCT_SELECTION';
 
-    try {
-      const { data } = await issuesService.findAll();
+  // ¿Mostrar detalle de order?
+  const bShowOrderDetails = state.order != null;
 
-      dispatch({ type: ActionsEnum.SET_ISSUES, payload: data });
-    } catch (err) {
-      // TODO: handle error
-      console.log(err);
-    } finally {
-      dispatch({ type: ActionsEnum.SET_LOADING, payload: false });
-    }
-  };
+  // ¿Mostrar información extra?
+  const bShowExtraInformation = state.workflowType === 'SHOW_EXTRA_INFORMATION';
 
-  // Obtener detalles de la order
-  const fetchOrder = async (orderId: string) => {
-    dispatch({ type: ActionsEnum.SET_LOADING, payload: true });
+  // Al hacer click en una issue
+  const handleIssueClick = (clicked: Issue) => setIssue(clicked);
 
-    try {
-      const { data } = await composerService.findOne('test', 'test', 'test');
-
-      dispatch({ type: ActionsEnum.SET_ORDER, payload: data });
-    } catch (err) {
-      // TODO: handle error
-      console.log(err);
-    } finally {
-      dispatch({ type: ActionsEnum.SET_LOADING, payload: false });
-    }
-  };
-
-  // Cambiar estado currentIssue cuando clickee una issue de la lista
-  const handleIssueClick = (clicked: Issue) => dispatch({ type: ActionsEnum.SET_CURRENT_ISSUE, payload: clicked });
-
-  // Seleccionar order
-  const handleOrderClick = (orderId: string) => {
-    fetchOrder(orderId);
-  };
-
-  // Obtener lista de issues al montar componente (client-side)
-  React.useEffect(() => {
-    fetchIssues();
-  }, []);
+  // Al hacer click en una order
+  const handleOrderClick = (orderId: string) => fetchOrder(orderId);
 
   if (state.isLoading) return <b>Cargando...</b>;
 
@@ -137,10 +44,10 @@ const AyudaPage: NextPage = () => {
           <h2>{state.currentIssue.title}</h2>
         </TitleContainer>
       )}
-      {bShowIssuesList && <IssueList issues={state.issues} onIssueClick={handleIssueClick} />}
+      {bShowIssuesList && state.issues && <IssueList issues={state.issues} onIssueClick={handleIssueClick} />}
       {bShowOrdersList && <OrdersList onOrderClick={handleOrderClick} />}
-      {bShowOrderDetails && <OrderDetails order={state.order} />}
-
+      {bShowExtraInformation && state.currentIssue && <span>{JSON.stringify(state.currentIssue.extraInformation)}</span>}
+      {state.order && <OrderDetails order={state.order} />}
       Current workflow type: {state.workflowType || 'None'} | Current workflow order: {state.workflowOrder}
     </ContentContainer>
   );
